@@ -1,0 +1,25 @@
+# Claude (NO subir al repositorio)
+.claude/
+.clauderc
+
+# Node (si se usa npm en algún momento)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Build
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs y temporales
+*.log
+*.tmp

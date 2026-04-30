@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Siniestros Viales — Bogotá D.C. 2015–2021</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Overlay de carga -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Cargando datos</p>
+      <p class="loading-sub">199 146 registros &middot; Espere un momento</p>
+    </div>
+  </div>
+
+  <!-- Backdrop del drawer -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <!-- Drawer de filtros -->
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Panel de filtros">
+    <header class="drawer-head">
+      <h2>Filtros</h2>
+      <button class="drawer-close" id="close-filters" aria-label="Cerrar panel de filtros">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="6" y1="18" x2="18" y2="6"/>
+        </svg>
+      </button>
+    </header>
+    <div class="drawer-body">
+      <div class="filter-group">
+        <span class="filter-label">Año</span>
+        <div id="filtro-anio" class="checkgroup"></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Gravedad</span>
+        <div id="filtro-gravedad" class="checkgroup"></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Clase de accidente</span>
+        <div id="filtro-clase" class="checkgroup"></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Localidad</span>
+        <div id="filtro-localidad" class="checkgroup checkgroup--scroll"></div>
+      </div>
+      <button class="btn-reset" id="btn-reset">Restablecer filtros</button>
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="app" id="app">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-header-title">
+        <h1>Siniestros viales en Bogotá D.C.</h1>
+        <p class="app-subtitle">Histórico 2015–2021 &middot; Datos abiertos — Secretaría Distrital de Movilidad</p>
+        <p class="app-description">Este dashboard explora el registro oficial de siniestros viales de Bogotá D.C., publicado por la Secretaría Distrital de Movilidad. Cada registro corresponde a un evento reportado entre enero de 2015 y septiembre de 2021, con fecha y hora exacta, localidad, dirección, clase de accidente —choque, atropello, caída de ocupante, entre otros— y nivel de gravedad: solo daños materiales, heridos o muertos.<br><br>El dataset cubre seis años de datos y permite identificar patrones temporales, geográficos y por tipo de siniestro. Hay un quiebre claro en marzo de 2020, cuando las medidas de confinamiento por COVID-19 cambiaron abruptamente los volúmenes y tipos de accidentes registrados.</p>
+      </div>
+      <div class="app-header-actions">
+        <button class="filters-trigger" id="open-filters" aria-haspopup="dialog" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="7" y1="12" x2="17" y2="12"/>
+            <line x1="10" y1="18" x2="14" y2="18"/>
+          </svg>
+          Filtros
+        </button>
+        <button class="btn-theme" id="btn-theme" aria-label="Cambiar a modo oscuro" title="Cambiar tema">
+          <!-- Luna: visible en modo claro -->
+          <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sol: visible en modo oscuro -->
+          <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- KPIs (dividers, sin cards) -->
+    <div class="kpis" role="region" aria-label="Indicadores clave">
+      <div class="kpi">
+        <span class="kpi-label">Total siniestros</span>
+        <span class="kpi-value num" data-kpi="total">—</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Localidad líder</span>
+        <span class="kpi-value" data-kpi="loc">—</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Clase dominante</span>
+        <span class="kpi-value" data-kpi="clase">—</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Hora crítica</span>
+        <span class="kpi-value num" data-kpi="hora">—</span>
+      </div>
+    </div>
+
+    <!-- Selector de hallazgo -->
+    <nav class="tabs" role="tablist" aria-label="Selector de visualización">
+      <button class="tab is-active" data-chart="mensual" role="tab" aria-selected="true">Tendencia temporal</button>
+      <button class="tab" data-chart="localidades" role="tab" aria-selected="false">Localidades</button>
+      <button class="tab" data-chart="gravedad" role="tab" aria-selected="false">Gravedad</button>
+      <button class="tab" data-chart="heatmap" role="tab" aria-selected="false">Heatmap hora-día</button>
+      <button class="tab" data-chart="mapa" role="tab" aria-selected="false">Mapa</button>
+    </nav>
+
+    <!-- Stage del gráfico activo -->
+    <section class="chart-stage" id="stage" aria-live="polite" aria-label="Visualización activa">
+      <header class="stage-head">
+        <h2 class="stage-title" id="stage-title">La pandemia de 2020 quiebra una tendencia estable</h2>
+      </header>
+      <div class="stage-body" id="stage-body">
+        <svg id="chart" class="chart-svg" aria-label="Gráfico activo"></svg>
+        <div id="leaflet-map" aria-label="Mapa coroplético de localidades de Bogotá"></div>
+        <div class="empty-state" id="empty-state" aria-live="polite">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <p>Sin datos para los filtros seleccionados</p>
+          <button class="btn-reset-inline" id="btn-reset-inline">Restablecer filtros</button>
+        </div>
+      </div>
+      <p class="stage-insight" id="stage-insight"></p>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="app-footer">
+      Fuente: <a href="https://www.datos.gov.co/dataset/Historico-Siniestros-Bogot-D-C/3v2w-chcq/about_data" target="_blank" rel="noopener" class="footer-link">Datos abiertos Bogotá &mdash; Secretaría Distrital de Movilidad</a> &middot;
+      Proyecto 2, Herramientas y Visualización de Datos
+    </footer>
+  </div>
+
+  <!-- Tooltip global -->
+  <div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/chart-mensual.js"></script>
+  <script src="js/chart-localidades.js"></script>
+  <script src="js/chart-gravedad.js"></script>
+  <script src="js/chart-heatmap.js"></script>
+  <script src="js/chart-mapa.js"></script>
+  <script src="js/url-state.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
