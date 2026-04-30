@@ -10,16 +10,15 @@ Aplicación web interactiva construida con **D3.js v7** y **Leaflet.js** que vis
 ## Tabla de contenidos
 
 1. [Demo en vivo](#demo-en-vivo)
-2. [Capturas de pantalla](#capturas-de-pantalla)
-3. [Dataset](#dataset)
-4. [Hallazgos principales](#hallazgos-principales)
-5. [Funcionalidades](#funcionalidades)
-6. [Tecnologías](#tecnologías)
-7. [Estructura del proyecto](#estructura-del-proyecto)
-8. [Ejecución local](#ejecución-local)
-9. [Despliegue en GitHub Pages](#despliegue-en-github-pages)
-10. [Fragmentos de código clave](#fragmentos-de-código-clave)
-11. [Fuente de datos](#fuente-de-datos)
+2. [Dataset](#dataset)
+3. [Hallazgos principales](#hallazgos-principales)
+4. [Funcionalidades](#funcionalidades)
+5. [Tecnologías](#tecnologías)
+6. [Estructura del proyecto](#estructura-del-proyecto)
+7. [Ejecución local](#ejecución-local)
+8. [Despliegue en GitHub Pages](#despliegue-en-github-pages)
+9. [Fragmentos de código clave](#fragmentos-de-código-clave)
+10. [Fuente de datos](#fuente-de-datos)
 
 ---
 
@@ -50,20 +49,6 @@ Parámetros disponibles:
 | `gravedad` | `CON+HERIDOS`, `CON+MUERTOS`, `SOLO+DANOS`, `SIN+DATO` | `?gravedad=CON+HERIDOS`        |
 | `clase`    | `CHOQUE`, `ATROPELLO`, `VOLCAMIENTO`, etc.            | `?clase=CHOQUE,ATROPELLO`      |
 | `compact`  | `true`                                                | `?compact=true`                |
-
----
-
-## Capturas de pantalla
-
-> Agrega tus capturas en la carpeta `/screenshots` y actualiza estas rutas.
-
-| Tendencia temporal | Mapa coroplético |
-|--------------------|-----------------|
-| ![Tendencia](screenshots/mensual.png) | ![Mapa](screenshots/mapa.png) |
-
-| Heatmap hora × día | Top localidades |
-|---------------------|-----------------|
-| ![Heatmap](screenshots/heatmap.png) | ![Localidades](screenshots/localidades.png) |
 
 ---
 
